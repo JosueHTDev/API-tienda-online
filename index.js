@@ -1,6 +1,9 @@
 // importando los módulos de express y cors 
 const express = require('express'); // framework para construir APIs
 const cors = require('cors'); // permite compartir recursos entre distintos orígenes
+const swaggerUi = require('swagger-ui-express');
+const swaggerFile = require('./swagger-output.json');
+
 require('dotenv').config(); // carga variables de entorno desde .env
 
 // Importar rutas
@@ -31,10 +34,14 @@ app.use('/api/productos', authMiddleware, adminMiddleware, productosRoutes);
 app.use('/api/categorias', authMiddleware, adminMiddleware, categoriasRoutes);
 app.use('/api/imagenes', authMiddleware, adminMiddleware, imagenesRoutes);
 
+// ruta documentación
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
 // Puerto de conexión
 const PORT = process.env.PORT || 3000;
 
 // Inicializar el servidor
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`)
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`📘 Documentación Swagger en http://localhost:${PORT}/api-docs`);
 });
