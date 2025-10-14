@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors'); 
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
+
 require('dotenv').config(); 
 
 const productosRoutes = require('./routes/productosRoutes');
@@ -14,27 +15,13 @@ const adminMiddleware = require('./middlewares/adminMiddleware');
 
 const app = express();
 
-const allowedOrigins = [
-  'http://169.197.85.174',
-  'http://localhost:3000',
-  'https://tienda-online-olive.vercel.app/'
-];
+app.use(cors()); 
+app.use(express.json()); 
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('No permitido por CORS'));
-    }
-  },
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-app.use(express.json());
-
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); 
+app.use('/api/productos', productosRoutes);  
+app.use('/api/categorias', categoriasRoutes); 
+app.use('/api/imagenes', imagenesRoutes);    
 
 app.use('/api/productos', authMiddleware, adminMiddleware, productosRoutes);
 app.use('/api/categorias', authMiddleware, adminMiddleware, categoriasRoutes);
