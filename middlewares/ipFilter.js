@@ -1,21 +1,21 @@
 // middlewares/ipFilter.js
 const ipFilter = (req, res, next) => {
-    // IP autorizada (la IP pública de tu red o servidor permitido)
-    const allowedIP = process.env.ALLOWED_IP; // ej: "181.64.23.100"
+    // Lista de IPs permitidas (puedes ponerlas en el .env también)
+    const allowedIPs = (process.env.ALLOWED_IPS || '').split(',').map(ip => ip.trim());
 
-    // Express puede devolver IP en distintos encabezados si está detrás de proxy
-    const clientIP = 
-        req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
-        req.connection.remoteAddress || 
+    // Obtener la IP real del cliente
+    const clientIP =
+        req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+        req.connection.remoteAddress ||
         req.socket.remoteAddress;
 
-    // Normaliza formato IPv6 -> IPv4 si es necesario
-    const normalizedIP = clientIP.replace('::ffff:', '');
+    const normalizedIP = clientIP.replace('::ffff:', ''); // normaliza IPv6 -> IPv4
 
-    if (normalizedIP === allowedIP) {
+    // Verificar si está en la lista
+    if (allowedIPs.includes(normalizedIP)) {
         next();
     } else {
-        console.warn(`Acceso denegado desde IP: ${normalizedIP}`);
+        console.warn(`⛔ Acceso denegado desde IP: ${normalizedIP}`);
         return res.status(403).json({ message: 'Acceso denegado: IP no autorizada' });
     }
 };
