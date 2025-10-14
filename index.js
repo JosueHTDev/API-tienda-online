@@ -43,5 +43,5 @@ const PORT = process.env.PORT || 3000;
 // Inicializar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
-    console.log(`📘 Documentación Swagger en http://localhost:${PORT}/api-docs`);
+    console.log(`Documentación Swagger en http://localhost:${PORT}/api-docs`);
 });

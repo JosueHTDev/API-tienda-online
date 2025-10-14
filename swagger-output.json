@@ -1,437 +1,328 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.1.0",
   "info": {
-    "title": "API Tienda Online",
-    "description": "Documentación automática generada con swagger-autogen",
-    "version": "1.0.0"
+    "title": "API - Tienda Online",
+    "version": "1.0.0",
+    "description": "Documentación del servicio web REST para la Tienda Online. Permite gestionar productos, categorías, imágenes y autenticación de usuarios mediante token."
   },
-  "host": "api-tienda-online-production.up.railway.app",
-  "basePath": "/",
-  "schemes": [
-    "https"
+  "servers": [
+    {
+      "url": "https://api-tienda-online-production.up.railway.app/",
+      "description": "Servidor de producción"
+    }
+  ],
+  "tags": [
+    { "name": "Auth", "description": "Endpoints de autenticación de usuarios" },
+    { "name": "Productos", "description": "Gestión de productos de la tienda" },
+    { "name": "Categorías", "description": "Gestión de categorías de productos" },
+    { "name": "Imágenes", "description": "Gestión de imágenes asociadas a productos" }
   ],
   "paths": {
     "/api/auth/register": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "id_rol": {
-                  "example": "any"
-                },
-                "usuario": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
+        "tags": ["Auth"],
+        "summary": "Registrar nuevo usuario",
+        "description": "Permite registrar un nuevo usuario con su rol correspondiente.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": { "usuario": "juanperez", "password": "123456", "id_rol": 2 }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado exitosamente",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": 5,
+                  "usuario": "juanperez",
+                  "id_rol": 2
                 }
               }
             }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
     },
     "/api/auth/login": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "usuario": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
+        "tags": ["Auth"],
+        "summary": "Iniciar sesión",
+        "description": "Devuelve un token JWT necesario para realizar operaciones protegidas.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": { "usuario": "juanperez", "password": "123456" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inicio de sesión exitoso",
+            "content": {
+              "application/json": {
+                "example": {
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 }
               }
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "401": { "description": "Credenciales inválidas" }
         }
       }
     },
-    "/api/productos/": {
+
+    "/api/productos": {
       "get": {
-        "description": "",
+        "tags": ["Productos"],
+        "summary": "Listar todos los productos",
+        "description": "Obtiene una lista de todos los productos disponibles con su categoría e imagen principal.",
         "responses": {
           "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Lista de productos obtenida",
+            "content": {
+              "application/json": {
+                "example": [
+                  { "id": 1, "nombre": "Laptop HP 15", "precio": 2500, "categoria": "Tecnología", "imagen": "https://cdn.tienda.com/laptops/hp15.jpg" },
+                  { "id": 2, "nombre": "Camisa Slim Fit", "precio": 120, "categoria": "Moda", "imagen": "https://cdn.tienda.com/moda/camisa-slimfit.jpg" }
+                ]
+              }
+            }
           }
         }
       },
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+        "security": [{ "bearerAuth": [] }],
+        "tags": ["Productos"],
+        "summary": "Crear producto",
+        "description": "Permite registrar un nuevo producto. **Requiere token válido.**",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "nombre": "Smartwatch Samsung Galaxy",
+                "precio": 899,
+                "categoria_id": 3
+              }
+            }
           }
-        ],
+        },
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Producto creado correctamente",
+            "content": {
+              "application/json": {
+                "example": { "id": 10, "nombre": "Smartwatch Samsung Galaxy", "precio": 899, "categoria_id": 3 }
+              }
+            }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/api/productos/categoria/{categoria_id}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "categoria_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "401": { "description": "No autorizado" }
         }
       }
     },
     "/api/productos/{id}": {
       "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "tags": ["Productos"],
+        "summary": "Obtener producto por ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "responses": {
           "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Detalle del producto",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": 1,
+                  "nombre": "Audífonos JBL",
+                  "precio": 350,
+                  "categoria": "Tecnología",
+                  "imagenes": [
+                    { "id": 5, "url": "https://cdn.tienda.com/imagenes/jbl1.jpg" },
+                    { "id": 6, "url": "https://cdn.tienda.com/imagenes/jbl2.jpg" }
+                  ]
+                }
+              }
+            }
           }
         }
       },
       "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+        "security": [{ "bearerAuth": [] }],
+        "tags": ["Productos"],
+        "summary": "Actualizar producto",
+        "description": "Actualiza la información de un producto existente. **Requiere token válido.**",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": { "nombre": "Audífonos JBL Tune 510BT", "precio": 370, "categoria_id": 3 }
+            }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Producto actualizado correctamente",
+            "content": { "application/json": { "example": { "id": 1, "nombre": "Audífonos JBL Tune 510BT", "precio": 370, "categoria_id": 3 } } }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "401": { "description": "No autorizado" }
         }
       },
       "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
+        "security": [{ "bearerAuth": [] }],
+        "tags": ["Productos"],
+        "summary": "Eliminar producto",
+        "description": "Elimina un producto según su ID. **Requiere token válido.**",
+        "responses": {
+          "200": { "description": "Producto eliminado", "content": { "application/json": { "example": { "mensaje": "Producto eliminado" } } } },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/api/productos/categoria/{categoria_id}": {
+      "get": {
+        "tags": ["Productos"],
+        "summary": "Obtener productos por categoría",
+        "parameters": [{ "name": "categoria_id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "responses": {
           "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Productos de la categoría seleccionada",
+            "content": {
+              "application/json": {
+                "example": [
+                  { "id": 7, "nombre": "Zapatillas Nike Air", "precio": 420, "categoria": "Moda", "imagen": "https://cdn.tienda.com/moda/nikeair.jpg" }
+                ]
+              }
+            }
           }
         }
       }
     },
-    "/api/categorias/": {
+
+    "/api/categorias": {
       "get": {
-        "description": "",
+        "tags": ["Categorías"],
+        "summary": "Listar categorías",
         "responses": {
           "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Lista de categorías disponibles",
+            "content": {
+              "application/json": {
+                "example": [
+                  { "id": 1, "nombre": "Tecnología" },
+                  { "id": 2, "nombre": "Moda" },
+                  { "id": 3, "nombre": "Accesorios" }
+                ]
+              }
+            }
           }
         }
       },
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+        "security": [{ "bearerAuth": [] }],
+        "tags": ["Categorías"],
+        "summary": "Crear categoría",
+        "description": "Crea una nueva categoría de productos. **Requiere token válido.**",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": { "nombre": "Electrodomésticos" }
+            }
           }
-        ],
+        },
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Categoría creada correctamente",
+            "content": { "application/json": { "example": { "id": 4, "nombre": "Electrodomésticos" } } }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "401": { "description": "No autorizado" }
         }
       }
     },
     "/api/categorias/{id}": {
       "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
+        "security": [{ "bearerAuth": [] }],
+        "tags": ["Categorías"],
+        "summary": "Actualizar categoría",
+        "description": "Actualiza el nombre de una categoría. **Requiere token válido.**",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "example": { "nombre": "Moda Hombre" } } }
+        },
+        "responses": {
+          "200": { "description": "Categoría actualizada", "content": { "application/json": { "example": { "id": 2, "nombre": "Moda Hombre" } } } },
+          "401": { "description": "No autorizado" }
+        }
+      },
+      "delete": {
+        "security": [{ "bearerAuth": [] }],
+        "tags": ["Categorías"],
+        "summary": "Eliminar categoría",
+        "description": "Elimina una categoría existente. **Requiere token válido.**",
+        "responses": {
+          "200": { "description": "Categoría eliminada", "content": { "application/json": { "example": { "mensaje": "Categoría eliminada" } } } },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+
+    "/api/imagenes/{producto_id}": {
+      "get": {
+        "tags": ["Imágenes"],
+        "summary": "Obtener imágenes de un producto",
+        "parameters": [{ "name": "producto_id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "responses": {
           "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Imágenes encontradas",
+            "content": {
+              "application/json": {
+                "example": [
+                  { "id": 10, "producto_id": 15, "url": "https://cdn.tienda.com/imagenes/jbl-headset-1.jpg" },
+                  { "id": 11, "producto_id": 15, "url": "https://cdn.tienda.com/imagenes/jbl-headset-2.jpg" }
+                ]
+              }
+            }
           }
         }
       },
       "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
+        "security": [{ "bearerAuth": [] }],
+        "tags": ["Imágenes"],
+        "summary": "Eliminar imagen de producto",
+        "description": "Elimina una imagen según su ID. **Requiere token válido.**",
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "200": { "description": "Imagen eliminada", "content": { "application/json": { "example": { "mensaje": "Imagen eliminada" } } } },
+          "401": { "description": "No autorizado" }
         }
       }
     },
-    "/api/imagenes/{producto_id}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "producto_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/api/imagenes/": {
+    "/api/imagenes": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
+        "security": [{ "bearerAuth": [] }],
+        "tags": ["Imágenes"],
+        "summary": "Agregar imagen a producto",
+        "description": "Permite subir una nueva imagen asociada a un producto. **Requiere token válido.**",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "example": { "url": "https://cdn.tienda.com/imagenes/jbl3.jpg", "producto_id": 15 } } }
+        },
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Imagen agregada correctamente",
+            "content": { "application/json": { "example": { "id": 12, "url": "https://cdn.tienda.com/imagenes/jbl3.jpg", "producto_id": 15 } } }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "401": { "description": "No autorizado" }
         }
       }
-    },
-    "/api/imagenes/{id}": {
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
     }
   }
 }
