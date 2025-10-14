@@ -15,7 +15,23 @@ const adminMiddleware = require('./middlewares/adminMiddleware');
 
 const app = express();
 
-app.use(cors()); 
+const allowedOrigins = [
+  'https://tienda-online-olive.vercel.app/',  
+  'http://45.232.149.130'            
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No autorizado por CORS'));
+    }
+  },
+}));
+
 app.use(express.json()); 
 
 app.use('/api/auth', authRoutes); 
