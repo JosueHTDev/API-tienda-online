@@ -1,46 +1,50 @@
-// importando los módulos de express y cors 
-const express = require('express'); // framework para construir APIs
-const cors = require('cors'); // permite compartir recursos entre distintos orígenes
+const express = require('express'); 
+const cors = require('cors'); 
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
 
-require('dotenv').config(); // carga variables de entorno desde .env
+require('dotenv').config(); 
 
-// Importar rutas
 const productosRoutes = require('./routes/productosRoutes');
 const categoriasRoutes = require('./routes/categoriasRoutes');
 const imagenesRoutes = require('./routes/imagenesRoutes');
 const authRoutes = require('./routes/authRoutes');
 
-// Importar middlewares de autenticación y roles
 const authMiddleware = require('./middlewares/authMiddleware');
 const adminMiddleware = require('./middlewares/adminMiddleware');
 
-// Crear instancia de express 
+
 const app = express();
 
-// Middlewares globales
-app.use(cors()); 
+const allowedIP = 'http://45.232.149.146';
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (origin === allowedIP || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  }
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json()); 
 
-// Rutas públicas (no necesitan autenticación)
 app.use('/api/auth', authRoutes); 
-app.use('/api/productos', productosRoutes);   // GET público
-app.use('/api/categorias', categoriasRoutes); // GET público
-app.use('/api/imagenes', imagenesRoutes);     // GET público
+app.use('/api/productos', productosRoutes);  
+app.use('/api/categorias', categoriasRoutes); 
+app.use('/api/imagenes', imagenesRoutes);    
 
-// Rutas protegidas (solo admin puede crear, modificar o eliminar)
 app.use('/api/productos', authMiddleware, adminMiddleware, productosRoutes);
 app.use('/api/categorias', authMiddleware, adminMiddleware, categoriasRoutes);
 app.use('/api/imagenes', authMiddleware, adminMiddleware, imagenesRoutes);
 
-// ruta documentación
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
-// Puerto de conexión
 const PORT = process.env.PORT || 3000;
 
-// Inicializar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
     console.log(`Documentación Swagger en http://localhost:${PORT}/api-docs`);
