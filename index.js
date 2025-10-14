@@ -12,26 +12,12 @@ const authRoutes = require('./routes/authRoutes');
 
 const authMiddleware = require('./middlewares/authMiddleware');
 const adminMiddleware = require('./middlewares/adminMiddleware');
+const ipFilter = require('./middlewares/ipFilter');
+app.use(ipFilter);
 
 const app = express();
 
-const allowedOrigins = [
-  'https://tienda-online-olive.vercel.app/',  
-  'http://45.232.149.130'            
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('No autorizado por CORS'));
-    }
-  },
-}));
-
+app.use(cors()); 
 app.use(express.json()); 
 
 app.use('/api/auth', authRoutes); 
