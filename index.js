@@ -13,12 +13,13 @@ const authRoutes = require('./routes/authRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
 const adminMiddleware = require('./middlewares/adminMiddleware');
 const ipFilter = require('./middlewares/ipFilter');
-app.use(ipFilter);
 
 const app = express();
 
 app.use(cors()); 
 app.use(express.json()); 
+
+app.use(ipFilter);
 
 app.use('/api/auth', authRoutes); 
 app.use('/api/productos', productosRoutes);  
