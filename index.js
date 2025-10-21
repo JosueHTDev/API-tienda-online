@@ -20,9 +20,8 @@ app.use(express.json());
 
 // Lista de IPs permitidas (las del instituto)
 const allowedIPs = [
-  '168.194.102.29',  // ejemplo IP 1
-  '168.194.102.27',  // ejemplo IP 2
-  '168.194.102.30'   // ejemplo IP 3
+  '45.232.149.130',  // ejemplo IP 1
+  '45.232.149.146',  // ejemplo IP 2
 ];
 
 app.get('/api/check-access', (req, res) => {
