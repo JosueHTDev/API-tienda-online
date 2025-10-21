@@ -25,20 +25,23 @@ const allowedIPs = [
   '168.194.102.30'   // ejemplo IP 3
 ];
 
-// Middleware para restringir IPs
-app.use((req, res, next) => {
+app.get('/api/check-access', (req, res) => {
   const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  
-  // Algunas veces Railway pasa la IP con "::ffff:" delante
   const cleanIP = clientIP.replace('::ffff:', '');
 
+  console.log('Solicitud desde IP:', cleanIP);
+
   if (!allowedIPs.includes(cleanIP)) {
-    console.log(`❌ Acceso denegado desde IP: ${cleanIP}`);
-    return res.status(403).json({ message: 'Acceso no autorizado desde esta red.' });
+    return res.status(403).json({
+      authorized: false,
+      message: 'Acceso no autorizado desde esta red.'
+    });
   }
 
-  console.log(`✅ Acceso permitido desde IP: ${cleanIP}`);
-  next();
+  return res.json({
+    authorized: true,
+    message: 'Acceso permitido.'
+  });
 });
 
 app.use('/api/auth', authRoutes); 
