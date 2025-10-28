@@ -18,10 +18,12 @@ const app = express();
 app.use(cors()); 
 app.use(express.json()); 
 
-// Lista de IPs permitidas (las del instituto)
+// Lista de IPs permitidas las del instituto
 const allowedIPs = [
-  '45.232.149.130',  // ejemplo IP 1
-  '45.232.149.146',  // ejemplo IP 2
+  '45.232.149.130',  
+  '45.232.149.146',
+  '168.194.102.27',
+  '168.194.102.29'
 ];
 
 app.get('/api/check-access', (req, res) => {
